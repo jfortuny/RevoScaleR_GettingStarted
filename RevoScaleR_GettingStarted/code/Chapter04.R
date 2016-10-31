@@ -16,6 +16,10 @@ airDS <- rxImport(inData = inputFile,
 str(airDS)
 head(airDS)
 
+#airDS <- rxImport(inData = "./data/ADS.xdf",
+    #missingValueString = "M",
+    #stringsAsFactors = TRUE)
+
 colInfo <- list(DayOfWeek = list(type = "factor",
             levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
 startTime <- Sys.time()
@@ -25,6 +29,11 @@ airDS <- rxImport(inData = inputFile,
     colInfo = colInfo,
     overwrite = TRUE)
 (runTime <- Sys.time() - startTime)
+
+#airDS <- rxImport(inData = "./data/ADS.xdf",
+    #missingValueString = "M",
+    #colInfo = colInfo,
+    #stringsAsFactors = TRUE)
 
 # 4.2 ##################################################################################
 dim(airDS)
@@ -71,3 +80,11 @@ countsDF
 rxLinePlot(ArrDelay ~ DayOfWeek, data = countsDF, main = "Average Arrival Delay by Day Of Week")
 
 # 4.4.3 ################################################################################
+arrDelayLm3 <- rxLinMod(ArrDelay ~ DayOfWeek:F(CRSDepTime),
+    data = airDS, cube = TRUE)
+arrDelayDT <- rxResultsDF(arrDelayLm3, type = "counts")
+head(arrDelayDT, 15)
+rxLinePlot(ArrDelay ~ CRSDepTime | DayOfWeek, data = arrDelayDT,
+    title = "Average Arrival Delay by Day Of Ween By Departure Hour")
+
+# 4.5 ##################################################################################
